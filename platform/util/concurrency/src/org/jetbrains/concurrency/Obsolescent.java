@@ -7,3 +7,4 @@ public interface Obsolescent {
    */
   boolean isObsolete();
 }
+// air-stand-touch

@@ -8,3 +8,4 @@ import org.jetbrains.annotations.NotNull;
 public interface ArrayFactory<T> {
   T @NotNull [] create(int count);
 }
+// air-stand-touch

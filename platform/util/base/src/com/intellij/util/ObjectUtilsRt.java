@@ -14,3 +14,4 @@ public final class ObjectUtilsRt {
   @ReviseWhenPortedToJDK("9")
   public static void reachabilityFence(@SuppressWarnings("unused") @NotNull Object o) { }
 }
+// air-stand-touch

@@ -19,3 +19,4 @@ public interface Function<Param, Result> extends java.util.function.Function<Par
     return fun(param);
   }
 }
+// air-stand-touch

@@ -37,3 +37,4 @@ public class SoftReference<T> extends java.lang.ref.SoftReference<T> implements 
     return ref == null ? null : ref.get();
   }
 }
+// air-stand-touch

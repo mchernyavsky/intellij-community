@@ -11,3 +11,4 @@ public interface AsyncFutureResult<V> extends AsyncFuture<V> {
   void set(V value);
   void setException(@NotNull Throwable t);
 }
+// air-stand-touch

@@ -31,3 +31,4 @@ public class StringHashBenchmark {
     return Murmur3_32Hash.MURMUR3_32.hashUnencodedChars(data);
   }
 }
+// air-stand-touch

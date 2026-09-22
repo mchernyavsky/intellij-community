@@ -23,3 +23,4 @@ public final class ConcatenationQuery<T> extends AbstractQuery<T> {
   }
 }
 
+// air-stand-touch
