@@ -16,3 +16,4 @@ public interface RowIcon extends CompositeIcon, DarkIconProvider {
   List<Icon> getAllIcons();
 }
 // air-stand-touch
+// air-stand-touch

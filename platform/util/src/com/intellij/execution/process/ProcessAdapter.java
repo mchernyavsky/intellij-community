@@ -8,3 +8,4 @@ package com.intellij.execution.process;
 public abstract class ProcessAdapter implements ProcessListener {
 }
 // air-stand-touch
+// air-stand-touch

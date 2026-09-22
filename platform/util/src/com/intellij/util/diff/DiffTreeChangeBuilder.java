@@ -10,3 +10,4 @@ public interface DiffTreeChangeBuilder<OT, NT> {
   void nodeInserted(@NotNull OT oldParent, @NotNull NT newNode, int pos);
 }
 // air-stand-touch
+// air-stand-touch
