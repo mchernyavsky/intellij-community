@@ -155,3 +155,4 @@ public class SingleCharAlternationInspection extends LocalInspectionTool {
     return text.toString();
   }
 }
+// air-stand-touch-1790095798

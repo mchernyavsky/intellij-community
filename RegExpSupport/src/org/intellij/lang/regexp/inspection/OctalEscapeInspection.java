@@ -75,4 +75,4 @@ public class OctalEscapeInspection extends LocalInspectionTool {
       RegExpReplacementUtil.replaceInContext(element, buildReplacementText(regExpChar));
     }
   }
-}
+}// air-stand-touch-1790095798

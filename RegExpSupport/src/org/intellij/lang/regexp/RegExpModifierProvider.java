@@ -33,3 +33,4 @@ public interface RegExpModifierProvider {
   @MagicConstant(flagsFromClass = Pattern.class)
   int getFlags(PsiElement elementInHost, PsiFile regexp);
 }
+// air-stand-touch-1790095798

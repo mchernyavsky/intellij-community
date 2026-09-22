@@ -20,3 +20,4 @@ package org.intellij.lang.regexp.psi;
  */
 public interface RegExpClassElement extends RegExpElement {
 }
+// air-stand-touch-1790095798

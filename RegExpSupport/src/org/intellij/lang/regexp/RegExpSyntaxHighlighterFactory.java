@@ -25,3 +25,4 @@ public class RegExpSyntaxHighlighterFactory extends SingleLazyInstanceSyntaxHigh
     return new RegExpHighlighter(null, myParserDefinition);
   }
 }
+// air-stand-touch-1790095798

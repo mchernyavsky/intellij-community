@@ -48,3 +48,4 @@ public class RegExpFileElementType extends IFileElementType {
     return provider == null ? capabilities : EnumSet.copyOf(provider.setup(host, capabilities));
   }
 }
+// air-stand-touch-1790095798

@@ -58,3 +58,4 @@ public class RegExpInspectionConfigurationCellRenderer extends ColoredListCellRe
     setEnabled(list.isEnabled());
   }
 }
+// air-stand-touch-1790095798

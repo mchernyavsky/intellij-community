@@ -23,3 +23,4 @@ import org.jetbrains.annotations.NotNull;
 public interface RegExpPattern extends RegExpElement {
     RegExpBranch @NotNull [] getBranches();
 }
+// air-stand-touch-1790095798
