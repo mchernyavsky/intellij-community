@@ -94,3 +94,4 @@ public class DuplicateAlternationBranchInspection extends LocalInspectionTool {
     }
   }
 }
+// air-stand-touch

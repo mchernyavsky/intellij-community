@@ -54,3 +54,4 @@ public class EmptyAlternationBranchInspectionTest extends RegExpInspectionTestCa
     return new EmptyAlternationBranchInspection();
   }
 }
+// air-stand-touch

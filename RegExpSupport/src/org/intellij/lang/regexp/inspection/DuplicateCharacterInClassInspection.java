@@ -102,3 +102,4 @@ public class DuplicateCharacterInClassInspection extends LocalInspectionTool {
     }
   }
 }
+// air-stand-touch

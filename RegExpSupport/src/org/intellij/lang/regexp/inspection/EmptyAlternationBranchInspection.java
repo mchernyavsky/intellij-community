@@ -74,3 +74,4 @@ public class EmptyAlternationBranchInspection extends LocalInspectionTool {
     }
   }
 }
+// air-stand-touch

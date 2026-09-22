@@ -11,3 +11,4 @@ public class EcmaScriptRegExpSyntaxHighlighterFactory extends RegExpSyntaxHighli
     super(EcmaScriptRegexpLanguage.INSTANCE);
   }
 }
+// air-stand-touch

@@ -50,3 +50,4 @@ final class FlipElementsIntention extends PsiUpdateModCommandAction<PsiElement> 
     RegExpReplacementUtil.flipLeftRight((element instanceof RegExpChar) ? element : element.getPrevSibling(), element.getNextSibling());
   }
 }
+// air-stand-touch

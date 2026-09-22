@@ -56,3 +56,4 @@ public class TestJvmDifferentiateStrategy extends JvmDifferentiateStrategyImpl {
   }
 }
 
+// air-stand-touch

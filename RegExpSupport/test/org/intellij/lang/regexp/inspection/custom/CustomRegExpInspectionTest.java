@@ -106,3 +106,4 @@ public class CustomRegExpInspectionTest extends BasePlatformTestCase {
     return true;
   }
 }
+// air-stand-touch

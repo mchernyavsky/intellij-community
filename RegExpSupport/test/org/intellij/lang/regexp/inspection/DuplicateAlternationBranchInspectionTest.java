@@ -40,3 +40,4 @@ public class DuplicateAlternationBranchInspectionTest extends RegExpInspectionTe
     return new DuplicateAlternationBranchInspection();
   }
 }
+// air-stand-touch

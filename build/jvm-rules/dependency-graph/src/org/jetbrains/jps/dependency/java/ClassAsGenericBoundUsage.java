@@ -25,3 +25,4 @@ public final class ClassAsGenericBoundUsage extends ClassUsage {
     return super.hashCode() + 3;
   }
 }
+// air-stand-touch

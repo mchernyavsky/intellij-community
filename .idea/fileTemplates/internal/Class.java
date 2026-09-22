@@ -2,3 +2,4 @@
 #parse("File Header.java")
 final class ${NAME} {
 }
+// air-stand-touch

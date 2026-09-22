@@ -39,3 +39,4 @@ final class CharRangeFix extends PsiUpdateModCommandAction<RegExpCharRange> {
     RegExpReplacementUtil.flipLeftRight(charRange.getFrom(), charRange.getTo());
   }
 }
+// air-stand-touch

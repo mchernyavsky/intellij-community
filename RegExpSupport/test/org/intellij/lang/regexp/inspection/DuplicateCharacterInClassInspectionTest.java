@@ -45,3 +45,4 @@ public class DuplicateCharacterInClassInspectionTest extends RegExpInspectionTes
     return new DuplicateCharacterInClassInspection();
   }
 }
+// air-stand-touch

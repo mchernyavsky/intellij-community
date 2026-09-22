@@ -78,3 +78,4 @@ public class RegExpCompletionTest extends CodeInsightFixtureTestCase {
       assertEquals(0, myFixture.completeBasic().length);
     }
 }
+// air-stand-touch

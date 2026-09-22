@@ -55,3 +55,4 @@ public interface RegExpChar extends RegExpAtom, RegExpClassElement {
     /** Returns the character code point value, -1 if the escape sequence is invalid. */
     int getValue();
 }
+// air-stand-touch

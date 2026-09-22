@@ -260,3 +260,4 @@ public class ArtifactRepositoryManagerTest extends UsefulTestCase {
     Files.writeString(directory.resolve(artifactId + "-1" + classifierSuffix + "." + extension), content);
   }
 }
+// air-stand-touch

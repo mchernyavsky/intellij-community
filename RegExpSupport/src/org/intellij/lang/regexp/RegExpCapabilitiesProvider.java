@@ -13,3 +13,4 @@ public interface RegExpCapabilitiesProvider {
   @NotNull
   Set<RegExpCapability> setup(@NotNull PsiElement host, @NotNull Set<RegExpCapability> def);
 }
+// air-stand-touch

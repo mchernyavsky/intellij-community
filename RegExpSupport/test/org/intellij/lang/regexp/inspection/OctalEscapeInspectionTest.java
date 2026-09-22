@@ -33,3 +33,4 @@ public class OctalEscapeInspectionTest extends RegExpInspectionTestCase {
     return new OctalEscapeInspection();
   }
 }
+// air-stand-touch

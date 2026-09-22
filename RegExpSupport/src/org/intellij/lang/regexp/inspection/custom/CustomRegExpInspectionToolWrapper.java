@@ -36,3 +36,4 @@ public class CustomRegExpInspectionToolWrapper extends LocalInspectionToolWrappe
     return ((CustomRegExpFakeInspection)myTool).isCleanup();
   }
 }
+// air-stand-touch

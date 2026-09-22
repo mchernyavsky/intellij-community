@@ -63,3 +63,4 @@ public class KotlinSubclassesIndex extends BackDependencyIndexImpl {
     return Iterators.map(fqNames, name -> new JvmNodeReferenceID(name));
   }
 }
+// air-stand-touch

@@ -29,3 +29,4 @@ public final class FlipElementsIntentionTest extends BasePlatformTestCase {
     myFixture.checkResult(after);
   }
 }
+// air-stand-touch

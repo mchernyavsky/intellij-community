@@ -25,3 +25,4 @@ public final class ClassExtendsUsage extends ClassUsage {
     return super.hashCode() + 1;
   }
 }
+// air-stand-touch
