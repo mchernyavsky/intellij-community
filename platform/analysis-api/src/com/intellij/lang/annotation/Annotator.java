@@ -35,3 +35,4 @@ public interface Annotator extends PossiblyDumbAware {
    */
   void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder);
 }
+// air-stand-touch

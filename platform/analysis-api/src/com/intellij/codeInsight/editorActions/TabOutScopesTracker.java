@@ -81,3 +81,4 @@ public interface TabOutScopesTracker {
    */
   int removeScopeEndingAt(@NotNull Editor editor, int offset);
 }
+// air-stand-touch

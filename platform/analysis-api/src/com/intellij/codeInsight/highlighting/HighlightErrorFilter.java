@@ -20,3 +20,4 @@ public abstract class HighlightErrorFilter {
 
   public abstract boolean shouldHighlightErrorElement(@NotNull PsiErrorElement element);
 }
+// air-stand-touch

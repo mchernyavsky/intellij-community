@@ -18,3 +18,4 @@ package com.intellij.codeInsight.editorActions;
 public enum SmartBackspaceMode {
   OFF, AUTOINDENT, INDENT
 }
+// air-stand-touch

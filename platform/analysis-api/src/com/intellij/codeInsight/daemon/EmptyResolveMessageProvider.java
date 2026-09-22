@@ -35,3 +35,4 @@ public interface EmptyResolveMessageProvider {
   @NotNull
   String getUnresolvedMessagePattern();
 }
+// air-stand-touch

@@ -465,3 +465,4 @@ public final class Annotation implements Segment {
     myLazyQuickFixes = lazyQuickFixes;
   }
 }
+// air-stand-touch

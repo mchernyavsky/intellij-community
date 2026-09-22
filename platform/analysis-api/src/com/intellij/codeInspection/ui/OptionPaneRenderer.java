@@ -53,3 +53,4 @@ public interface OptionPaneRenderer {
     return !tool.getOptionsPane().equals(OptPane.EMPTY) || tool.createOptionsPanel() != null;
   }
 }
+// air-stand-touch

@@ -28,3 +28,4 @@ public interface BatchQuickFix {
                 final @NotNull List<PsiElement> psiElementsToIgnore,
                 final @Nullable Runnable refreshViews);
 }
+// air-stand-touch

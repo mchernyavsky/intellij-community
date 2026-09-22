@@ -27,3 +27,4 @@ public abstract class FilePropertyPusherBase<T> implements FilePropertyPusher<T>
                        @NotNull VirtualFile fileOrDir,
                        @NotNull T actualProperty);
 }
+// air-stand-touch

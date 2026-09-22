@@ -58,3 +58,4 @@ public interface CustomizableIntentionActionDelegate extends IntentionActionDele
     return CustomizableIntentionAction.super.getRangesToHighlight(editor, file);
   }
 }
+// air-stand-touch

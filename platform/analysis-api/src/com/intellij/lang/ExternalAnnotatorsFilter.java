@@ -17,3 +17,4 @@ public interface ExternalAnnotatorsFilter {
 
   boolean isProhibited(ExternalAnnotator annotator, PsiFile file);
 }
+// air-stand-touch

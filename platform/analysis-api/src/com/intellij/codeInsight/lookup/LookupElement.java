@@ -177,3 +177,4 @@ public abstract class LookupElement extends UserDataHolderBase {
     return !presentation.getTailFragments().isEmpty();
   }
 }
+// air-stand-touch

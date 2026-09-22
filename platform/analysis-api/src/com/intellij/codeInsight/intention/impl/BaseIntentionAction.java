@@ -43,3 +43,4 @@ public abstract class BaseIntentionAction implements IntentionAction {
            || ScratchUtil.isScratch(virtualFile)
            || (containingFile != null && containingFile.getViewProvider().getVirtualFile().getFileSystem() instanceof NonPhysicalFileSystem);
   }}
+// air-stand-touch

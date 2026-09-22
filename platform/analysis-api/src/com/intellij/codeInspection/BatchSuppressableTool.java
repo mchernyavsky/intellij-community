@@ -25,3 +25,4 @@ public interface BatchSuppressableTool {
   SuppressQuickFix @NotNull [] getBatchSuppressActions(final @Nullable PsiElement element);
 
 }
+// air-stand-touch

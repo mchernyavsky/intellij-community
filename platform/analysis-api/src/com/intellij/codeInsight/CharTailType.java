@@ -52,3 +52,4 @@ public class CharTailType extends ModNavigatorTailType {
     return "CharTailType:'" + myChar + "'";
   }
 }
+// air-stand-touch

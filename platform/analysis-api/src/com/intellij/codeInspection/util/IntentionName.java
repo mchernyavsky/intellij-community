@@ -10,3 +10,4 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE_USE, ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 public @Nls(capitalization = Nls.Capitalization.Sentence) @interface IntentionName {
 }
+// air-stand-touch

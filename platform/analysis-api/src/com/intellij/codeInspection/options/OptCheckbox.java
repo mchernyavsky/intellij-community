@@ -51,3 +51,4 @@ public record OptCheckbox(@Language("jvm-field-name") @NotNull String bindId,
     return new OptCheckbox(bindPrefix + "." + bindId, label, ContainerUtil.map(children, c -> c.prefix(bindPrefix)), description);
   }
 }
+// air-stand-touch

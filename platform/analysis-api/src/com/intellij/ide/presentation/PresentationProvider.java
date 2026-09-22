@@ -17,3 +17,4 @@ public abstract class PresentationProvider<T> {
 
   public @Nullable @Nls(capitalization = Nls.Capitalization.Title) String getTypeName(T t) { return null; }
 }
+// air-stand-touch

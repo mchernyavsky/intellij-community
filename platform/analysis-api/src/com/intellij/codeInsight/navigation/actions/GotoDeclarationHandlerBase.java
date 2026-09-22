@@ -15,3 +15,4 @@ public abstract class GotoDeclarationHandlerBase implements GotoDeclarationHandl
 
   public abstract @Nullable PsiElement getGotoDeclarationTarget(@Nullable PsiElement sourceElement, Editor editor);
 }
+// air-stand-touch
