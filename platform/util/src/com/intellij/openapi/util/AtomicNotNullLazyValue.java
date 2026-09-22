@@ -43,3 +43,4 @@ public abstract class AtomicNotNullLazyValue<T> extends NotNullLazyValue<T> {
     return (AtomicNotNullLazyValue<T>)NotNullLazyValue.atomicLazy(() -> value.create());
   }
 }
+// air-stand-touch

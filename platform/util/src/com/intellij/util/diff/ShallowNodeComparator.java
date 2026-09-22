@@ -12,3 +12,4 @@ public interface ShallowNodeComparator<OldNode, NewNode> {
 
   boolean hashCodesEqual(@NotNull OldNode oldNode, @NotNull NewNode newNode);
 }
+// air-stand-touch

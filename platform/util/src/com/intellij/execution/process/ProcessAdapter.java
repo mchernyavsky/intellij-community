@@ -7,3 +7,4 @@ package com.intellij.execution.process;
 @Deprecated
 public abstract class ProcessAdapter implements ProcessListener {
 }
+// air-stand-touch

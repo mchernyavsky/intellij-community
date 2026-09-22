@@ -23,3 +23,4 @@ public interface FlyweightCapableTreeStructure<T> {
   int getStartOffset(@NotNull T node);
   int getEndOffset(@NotNull T node);
 }
+// air-stand-touch

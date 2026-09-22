@@ -62,3 +62,4 @@ public final class RegistryKeyDescriptor {
     return myPluginDescriptorPath;
   }
 }
+// air-stand-touch

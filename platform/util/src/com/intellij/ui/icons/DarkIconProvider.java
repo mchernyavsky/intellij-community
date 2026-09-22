@@ -8,3 +8,4 @@ import javax.swing.Icon;
 public interface DarkIconProvider {
   @NotNull Icon getDarkIcon(boolean isDark);
 }
+// air-stand-touch

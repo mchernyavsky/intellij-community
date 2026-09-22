@@ -7,3 +7,4 @@ import org.jetbrains.annotations.ApiStatus;
 public final class JetBrainsProtocolHandler {
   public static final String REQUIRED_PLUGINS_KEY = "idea.required.plugins.id";
 }
+// air-stand-touch

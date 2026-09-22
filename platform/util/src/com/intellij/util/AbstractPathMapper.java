@@ -74,3 +74,4 @@ public abstract class AbstractPathMapper implements PathMapper {
 
   protected abstract @NotNull @Unmodifiable Collection<PathMappingSettings.PathMapping> getAvailablePathMappings();
 }
+// air-stand-touch

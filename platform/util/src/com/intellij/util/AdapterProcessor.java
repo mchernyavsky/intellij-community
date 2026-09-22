@@ -21,3 +21,4 @@ public final class AdapterProcessor<T, S> implements Processor<T> {
     return myAdaptee.process(myConversion.fun(t));
   }
 }
+// air-stand-touch

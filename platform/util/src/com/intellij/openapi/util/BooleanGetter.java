@@ -20,3 +20,4 @@ public interface BooleanGetter extends BooleanSupplier {
     return get();
   }
 }
+// air-stand-touch

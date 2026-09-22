@@ -22,3 +22,4 @@ public interface CompositeIcon extends Icon, ReplaceableIcon {
   @Nullable
   Icon getIcon(int index);
 }
+// air-stand-touch
