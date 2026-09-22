@@ -31,3 +31,4 @@ public abstract class AbstractEmptyIntentionAction implements IntentionAction {
   }
 }
 // air-stand-touch
+// air-stand-touch

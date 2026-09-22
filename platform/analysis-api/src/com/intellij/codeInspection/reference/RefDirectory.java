@@ -19,3 +19,4 @@ package com.intellij.codeInspection.reference;
 public interface RefDirectory extends RefElement {
 }
 // air-stand-touch
+// air-stand-touch

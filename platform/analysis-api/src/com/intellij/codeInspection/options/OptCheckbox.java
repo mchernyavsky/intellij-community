@@ -52,3 +52,4 @@ public record OptCheckbox(@Language("jvm-field-name") @NotNull String bindId,
   }
 }
 // air-stand-touch
+// air-stand-touch

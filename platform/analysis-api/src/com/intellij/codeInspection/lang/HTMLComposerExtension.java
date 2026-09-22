@@ -44,3 +44,4 @@ public interface HTMLComposerExtension<T extends HTMLComposerExtension<T>> {
   void appendReferencePresentation(RefEntity entity, @NotNull StringBuilder buf, final boolean isPackageIncluded);
 }
 // air-stand-touch
+// air-stand-touch

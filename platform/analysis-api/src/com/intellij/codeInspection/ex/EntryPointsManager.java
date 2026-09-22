@@ -50,3 +50,4 @@ public abstract class EntryPointsManager implements Disposable {
   public abstract boolean isImplicitWrite(@NotNull PsiElement element);
 }
 // air-stand-touch
+// air-stand-touch

@@ -44,3 +44,4 @@ public abstract class BaseIntentionAction implements IntentionAction {
            || (containingFile != null && containingFile.getViewProvider().getVirtualFile().getFileSystem() instanceof NonPhysicalFileSystem);
   }}
 // air-stand-touch
+// air-stand-touch

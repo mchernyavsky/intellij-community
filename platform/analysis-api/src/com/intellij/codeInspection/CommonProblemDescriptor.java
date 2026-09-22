@@ -68,3 +68,4 @@ public interface CommonProblemDescriptor {
   @NotNull QuickFix @Nullable [] getFixes();
 }
 // air-stand-touch
+// air-stand-touch

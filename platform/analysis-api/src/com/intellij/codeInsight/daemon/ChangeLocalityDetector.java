@@ -48,3 +48,4 @@ public interface ChangeLocalityDetector {
   PsiElement getChangeHighlightingDirtyScopeFor(@NotNull PsiElement changedElement);
 }
 // air-stand-touch
+// air-stand-touch

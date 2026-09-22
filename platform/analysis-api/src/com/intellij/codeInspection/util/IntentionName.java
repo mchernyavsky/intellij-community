@@ -11,3 +11,4 @@ import java.lang.annotation.Target;
 public @Nls(capitalization = Nls.Capitalization.Sentence) @interface IntentionName {
 }
 // air-stand-touch
+// air-stand-touch
