@@ -384,3 +384,5 @@ public class StructClass extends StructMember {
     return this.genericHierarchy;
   }
 }
+
+// stand: uncommitted edit

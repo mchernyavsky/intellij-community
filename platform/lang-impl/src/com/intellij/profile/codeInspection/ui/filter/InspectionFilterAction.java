@@ -320,3 +320,4 @@ public final class InspectionFilterAction extends DefaultActionGroup implements 
     }
   }
 }
+// stand: uncommitted edit

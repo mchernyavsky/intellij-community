@@ -422,3 +422,5 @@ public class JavaMethodCallElement extends LookupItem<PsiMethod> implements Type
     }
   }
 }
+
+// stand: uncommitted edit

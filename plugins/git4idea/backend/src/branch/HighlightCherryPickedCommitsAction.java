@@ -154,3 +154,5 @@ public class HighlightCherryPickedCommitsAction extends ToggleAction implements 
     return GitRepositoryManager.getInstance(project).getRepositoryForRootQuick(root) != null;
   }
 }
+
+// stand: uncommitted edit

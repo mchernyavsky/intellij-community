@@ -14,3 +14,5 @@ public interface ValidatableSdkAdditionalData extends SdkAdditionalData {
    */
   void checkValid(SdkModel sdkModel) throws ConfigurationException;
 }
+
+// stand: commit one touched this file

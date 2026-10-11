@@ -66,3 +66,5 @@ public final class JpsAntInstallationImpl extends JpsElementBase<JpsAntInstallat
     }
   }
 }
+
+// stand: uncommitted edit

@@ -36,3 +36,5 @@ public final class NavigationItemFileStatus {
     return vFile == null ? FileStatus.NOT_CHANGED : FileStatusManager.getInstance(psiElement.getProject()).getStatus(vFile);
   }
 }
+
+// stand: uncommitted edit

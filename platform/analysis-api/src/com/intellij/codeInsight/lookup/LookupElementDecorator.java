@@ -306,3 +306,5 @@ public abstract class LookupElementDecorator<T extends LookupElement> extends Lo
     }
   }
 }
+
+// stand: uncommitted edit

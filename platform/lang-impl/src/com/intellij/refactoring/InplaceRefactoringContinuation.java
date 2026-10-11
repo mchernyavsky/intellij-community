@@ -45,3 +45,5 @@ public interface InplaceRefactoringContinuation {
    */
   boolean resumeRefactoring(@NotNull Project project, @NotNull Editor editor);
 }
+
+// stand: commit one touched this file

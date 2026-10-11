@@ -57,3 +57,5 @@ public final class DocumentationManagerUtil {
     createHyperlink(buffer, refText, label, plainLink);
   }
 }
+
+// stand: commit one touched this file
