@@ -398,3 +398,5 @@ public class ComponentWithBrowseButton<Comp extends JComponent> extends JPanel i
     }
   }
 }
+
+// stand: uncommitted edit

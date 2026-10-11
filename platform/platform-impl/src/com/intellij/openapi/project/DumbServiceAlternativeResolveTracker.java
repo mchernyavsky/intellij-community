@@ -18,3 +18,5 @@ public final class DumbServiceAlternativeResolveTracker {
     myAlternativeResolution.set(newValue == 0 ? null : newValue);
   }
 }
+
+// stand: uncommitted edit

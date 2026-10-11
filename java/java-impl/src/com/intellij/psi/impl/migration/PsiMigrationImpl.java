@@ -151,3 +151,5 @@ public class PsiMigrationImpl implements PsiMigration {
     return myIsValid;
   }
 }
+
+// stand: uncommitted edit

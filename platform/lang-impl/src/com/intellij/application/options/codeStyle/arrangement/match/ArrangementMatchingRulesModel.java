@@ -70,3 +70,5 @@ public final class ArrangementMatchingRulesModel extends DefaultTableModel {
     return getValueAt(row, column) instanceof ArrangementEditorAware;
   }
 }
+
+// stand: uncommitted edit

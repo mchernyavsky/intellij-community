@@ -3,3 +3,5 @@
 package com.intellij.ide.actions.ui;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
+
+// stand: uncommitted edit

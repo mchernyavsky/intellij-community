@@ -375,3 +375,5 @@ class DfFloatRangeType implements DfFloatType {
     return Objects.hash(myFrom, myTo, myInvert, myNaN);
   }
 }
+
+// stand: uncommitted edit

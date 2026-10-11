@@ -97,307 +97,307 @@ import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
-import javax.swing.plaf.ButtonUI;
-import javax.swing.plaf.ComboBoxUI;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.basic.BasicComboBoxUI;
-import javax.swing.plaf.basic.BasicRadioButtonUI;
-import javax.swing.plaf.basic.ComboPopup;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.Document;
-import javax.swing.text.EditorKit;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.NumberFormatter;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import java.awt.AWTError;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Event;
-import java.awt.FocusTraversalPolicy;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Frame;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.PrintGraphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.event.AWTEventListener;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.RGBImageFilter;
-import java.awt.print.PrinterGraphics;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import static com.intellij.openapi.util.text.StringUtil.THREE_DOTS;
-
-@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-public final class UIUtil {
-  public static final @NlsSafe String BORDER_LINE = "<hr size=1 noshade>";
-  public static final @NlsSafe String BR = "<br/>";
-  public static final @NlsSafe String HR = "<hr/>";
-  public static final @NlsSafe String LINE_SEPARATOR = "\n";
-  private static final Key<WeakReference<Component>> FOSTER_PARENT = Key.create("Component.fosterParent");
-  private static final Key<Boolean> HAS_FOCUS = Key.create("Component.hasFocus");
-
-  /**
-   * A key for hiding a line under the window title bar on macOS
-   * It works if and only if transparent title bars are enabled and IDE runs on JetBrains Runtime
-   */
-  @ApiStatus.Internal
-  public static final String NO_BORDER_UNDER_WINDOW_TITLE_KEY = "";
-
-  // cannot be static because logging maybe not configured yet
-  private static @NotNull Logger getLogger() {
-    return Logger.getInstance(UIUtil.class);
-  }
-
-  public static int getTransparentTitleBarHeight(JRootPane rootPane) {
-    Object property = rootPane.getClientProperty("Window.transparentTitleBarHeight");
-    if (property instanceof Integer) {
-      return (int)property;
-    }
-
-    if ("small".equals(rootPane.getClientProperty("Window.style"))) {
-      return JBUI.getInt("macOSWindow.Title.heightSmall", 19);
-    }
-    else {
-      return JBUI.getInt("macOSWindow.Title.height", SystemInfo.isMacOSBigSur ? 29 : 23);
-    }
-  }
-
-  // Here we setup dialog to be suggested in OwnerOptional as owner even if the dialog is not modal
-  public static void markAsPossibleOwner(Dialog dialog) {
-    ClientProperty.put(dialog, "PossibleOwner", Boolean.TRUE);
-  }
-
-  public static boolean isPossibleOwner(@NotNull Dialog dialog) {
-    return ClientProperty.isTrue(dialog, "PossibleOwner");
-  }
-
-  public static int getMultiClickInterval() {
-    Object property = Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
-    if (property instanceof Integer) {
-      return (Integer)property;
-    }
-    return 500;
-  }
-
-  private static final Supplier<Boolean> X_RENDER_ACTIVE = new SynchronizedClearableLazy<>(() -> {
-    if (!StartupUiUtil.isXToolkit()) {
-      return false;
-    }
-
-    try {
-      Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
-      Method method = clazz.getMethod("isXRenderAvailable");
-      return (Boolean)method.invoke(null);
-    }
-    catch (Throwable e) {
-      return false;
-    }
-  });
-
-  private static final String[] STANDARD_FONT_SIZES =
-    {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
-
-  public static void applyStyle(@NotNull ComponentStyle componentStyle, @NotNull Component comp) {
-    if (!(comp instanceof JComponent c)) {
-      return;
-    }
-
-    if (isUnderAquaBasedLookAndFeel()) {
-      c.putClientProperty("JComponent.sizeVariant", Strings.toLowerCase(componentStyle.name()));
-    }
-    FontSize fontSize;
-    if (componentStyle == ComponentStyle.MINI) {
-      fontSize = FontSize.MINI;
-    }
-    else if (componentStyle == ComponentStyle.SMALL) {
-      fontSize = FontSize.SMALL;
-    }
-    else {
-      fontSize = FontSize.NORMAL;
-    }
-    c.setFont(getFont(fontSize, c.getFont()));
-    Container p = c.getParent();
-    if (p != null) {
-      SwingUtilities.updateComponentTreeUI(p);
-    }
-  }
-
-  public static @Nullable Cursor cursorIfNotDefault(@Nullable Cursor cursorToSet) {
-    return cursorToSet != null && cursorToSet.getType() != Cursor.DEFAULT_CURSOR ? cursorToSet : null;
-  }
-
-  public static @NotNull RGBImageFilter getGrayFilter() {
-    return GrayFilter.namedFilter("grayFilter", new GrayFilter(33, -35, 100));
-  }
-
-  public static @NotNull RGBImageFilter getTextGrayFilter() {
-    return GrayFilter.namedFilter("text.grayFilter", new GrayFilter(20, 0, 100));
-  }
-
-  public static @NotNull Couple<Color> getCellColors(@NotNull JTable table, boolean isSel, int row, int column) {
-    return Couple.of(isSel ? table.getSelectionForeground() : table.getForeground(),
-                     isSel ? table.getSelectionBackground() : table.getBackground());
-  }
-
-  public static void fixOSXEditorBackground(@NotNull JTable table) {
-    if (!SystemInfoRt.isMac) {
-      return;
-    }
-
-    if (table.isEditing()) {
-      int column = table.getEditingColumn();
-      int row = table.getEditingRow();
-      Component renderer = column >= 0 && row >= 0 ? table.getCellRenderer(row, column)
-        .getTableCellRendererComponent(table, table.getValueAt(row, column), true, table.hasFocus(), row, column) : null;
-      Component component = table.getEditorComponent();
-      if (component != null && renderer != null) {
-        changeBackGround(component, renderer.getBackground());
-      }
-    }
-  }
-
-  public enum FontSize {NORMAL, SMALL, MINI}
-
-  public enum ComponentStyle {LARGE, REGULAR, SMALL, MINI}
-
-  public enum FontColor {NORMAL, BRIGHTER}
-
-  public static final char MNEMONIC = BundleBase.MNEMONIC;
-  public static final @NlsSafe String HTML_MIME = "text/html";
-  public static final @NonNls String TABLE_FOCUS_CELL_BACKGROUND_PROPERTY = "Table.focusCellBackground";
-  public static final @NonNls String CENTER_TOOLTIP_DEFAULT = "ToCenterTooltip";
-  public static final @NonNls String CENTER_TOOLTIP_STRICT = "ToCenterTooltip.default";
-
-  public static final @NonNls String ENABLE_IME_FORWARDING_IN_POPUP = "EnableIMEForwardingInPopup";
-
-  private static final Pattern CLOSE_TAG_PATTERN = Pattern.compile("<\\s*([^<>/ ]+)([^<>]*)/\\s*>", Pattern.CASE_INSENSITIVE);
-
-  public static final Key<Integer> KEEP_BORDER_SIDES = Key.create("keepBorderSides");
-
-  /**
-   * Alt+click does copy text from tooltip or balloon to clipboard.
-   * We collect this text from components recursively and this generic approach might 'grab' unexpected text fragments.
-   * To provide more accurate text scope you should mark dedicated component with putClientProperty(TEXT_COPY_ROOT, Boolean.TRUE)
-   * Note, main(root) components of BalloonImpl and AbstractPopup are already marked with this key
-   */
-  public static final Key<Boolean> TEXT_COPY_ROOT = Key.create("TEXT_COPY_ROOT");
-
-  private static final Color ACTIVE_HEADER_COLOR = JBColor.namedColor("HeaderColor.active", 0xa0bad5);
-  private static final Color INACTIVE_HEADER_COLOR = JBColor.namedColor("HeaderColor.inactive", Gray._128);
-
-  public static final Color CONTRAST_BORDER_COLOR = JBColor.namedColor("Borders.ContrastBorderColor", new JBColor(0xC9C9C9, 0x323232));
-
-  public static final Color SIDE_PANEL_BACKGROUND = JBColor.namedColor("SidePanel.background", new JBColor(0xE6EBF0, 0x3E434C));
-
-  public static final Color AQUA_SEPARATOR_BACKGROUND_COLOR = new JBColor(Gray._240, Gray.x51);
-  public static final Color TRANSPARENT_COLOR = Gray.TRANSPARENT;
-
-  public static final int DEFAULT_HGAP = 10;
-  public static final int DEFAULT_VGAP = 4;
-  public static final int LARGE_VGAP = 12;
-
-  private static final int REGULAR_PANEL_TOP_BOTTOM_INSET = 8;
-  private static final int REGULAR_PANEL_LEFT_RIGHT_INSET = 12;
-
-  public static final Insets PANEL_REGULAR_INSETS = getRegularPanelInsets();
-
-  public static final Insets PANEL_SMALL_INSETS = JBInsets.create(5, 8);
-
-  private static final @NonNls String ROOT_PANE = "JRootPane.future";
-
-  private static final Ref<Boolean> ourRetina = Ref.create(SystemInfoRt.isMac ? null : false);
-
-  private UIUtil() {
-  }
-
-  public static boolean isRetina(@NotNull Graphics2D graphics) {
-    return SystemInfoRt.isMac ? DetectRetinaKit.isMacRetina(graphics) : isRetina();
-  }
-
-  public static boolean isRetina() {
-    if (GraphicsEnvironment.isHeadless()) return false;
-
-    //Temporary workaround for HiDPI on Windows/Linux
-    if ("true".equalsIgnoreCase(System.getProperty("is.hidpi"))) {
-      return true;
-    }
-
-    if (Registry.is("new.retina.detection", false)) {
-      return DetectRetinaKit.isRetina();
-    }
-    else {
-      synchronized (ourRetina) {
+// import javax.swing.SwingConstants;
+// import javax.swing.SwingUtilities;
+// import javax.swing.UIManager;
+// import javax.swing.border.Border;
+// import javax.swing.border.LineBorder;
+// import javax.swing.plaf.ButtonUI;
+// import javax.swing.plaf.ComboBoxUI;
+// import javax.swing.plaf.ComponentUI;
+// import javax.swing.plaf.FontUIResource;
+// import javax.swing.plaf.basic.BasicComboBoxUI;
+// import javax.swing.plaf.basic.BasicRadioButtonUI;
+// import javax.swing.plaf.basic.ComboPopup;
+// import javax.swing.text.BadLocationException;
+// import javax.swing.text.DefaultCaret;
+// import javax.swing.text.DefaultFormatterFactory;
+// import javax.swing.text.Document;
+// import javax.swing.text.EditorKit;
+// import javax.swing.text.Element;
+// import javax.swing.text.JTextComponent;
+// import javax.swing.text.NumberFormatter;
+// import javax.swing.text.ViewFactory;
+// import javax.swing.text.html.HTMLDocument;
+// import javax.swing.text.html.HTMLEditorKit;
+// import java.awt.AWTError;
+// import java.awt.AlphaComposite;
+// import java.awt.Color;
+// import java.awt.Component;
+// import java.awt.Container;
+// import java.awt.Cursor;
+// import java.awt.Dialog;
+// import java.awt.Dimension;
+// import java.awt.Event;
+// import java.awt.FocusTraversalPolicy;
+// import java.awt.Font;
+// import java.awt.FontMetrics;
+// import java.awt.Frame;
+// import java.awt.GradientPaint;
+// import java.awt.Graphics;
+// import java.awt.Graphics2D;
+// import java.awt.GraphicsConfiguration;
+// import java.awt.GraphicsDevice;
+// import java.awt.GraphicsEnvironment;
+// import java.awt.HeadlessException;
+// import java.awt.Image;
+// import java.awt.Insets;
+// import java.awt.KeyboardFocusManager;
+// import java.awt.Paint;
+// import java.awt.Point;
+// import java.awt.PrintGraphics;
+// import java.awt.Rectangle;
+// import java.awt.Shape;
+// import java.awt.Toolkit;
+// import java.awt.Window;
+// import java.awt.event.AWTEventListener;
+// import java.awt.event.ActionListener;
+// import java.awt.event.ComponentAdapter;
+// import java.awt.event.ComponentEvent;
+// import java.awt.event.FocusAdapter;
+// import java.awt.event.FocusEvent;
+// import java.awt.event.FocusListener;
+// import java.awt.event.HierarchyEvent;
+// import java.awt.event.HierarchyListener;
+// import java.awt.event.InputEvent;
+// import java.awt.event.KeyEvent;
+// import java.awt.event.MouseEvent;
+// import java.awt.event.MouseListener;
+// import java.awt.event.MouseMotionListener;
+// import java.awt.event.MouseWheelListener;
+// import java.awt.event.WindowAdapter;
+// import java.awt.event.WindowEvent;
+// import java.awt.font.FontRenderContext;
+// import java.awt.font.GlyphVector;
+// import java.awt.geom.RoundRectangle2D;
+// import java.awt.image.BufferedImage;
+// import java.awt.image.ImageObserver;
+// import java.awt.image.RGBImageFilter;
+// import java.awt.print.PrinterGraphics;
+// import java.beans.PropertyChangeEvent;
+// import java.beans.PropertyChangeListener;
+// import java.io.BufferedInputStream;
+// import java.io.InputStream;
+// import java.lang.ref.WeakReference;
+// import java.lang.reflect.Method;
+// import java.net.URL;
+// import java.text.NumberFormat;
+// import java.text.ParseException;
+// import java.util.ArrayList;
+// import java.util.Arrays;
+// import java.util.Collection;
+// import java.util.Collections;
+// import java.util.HashSet;
+// import java.util.List;
+// import java.util.Objects;
+// import java.util.Set;
+// import java.util.concurrent.CompletableFuture;
+// import java.util.concurrent.Future;
+// import java.util.function.Supplier;
+// import java.util.regex.Pattern;
+// 
+// import static com.intellij.openapi.util.text.StringUtil.THREE_DOTS;
+// 
+// @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
+// public final class UIUtil {
+//   public static final @NlsSafe String BORDER_LINE = "<hr size=1 noshade>";
+//   public static final @NlsSafe String BR = "<br/>";
+//   public static final @NlsSafe String HR = "<hr/>";
+//   public static final @NlsSafe String LINE_SEPARATOR = "\n";
+//   private static final Key<WeakReference<Component>> FOSTER_PARENT = Key.create("Component.fosterParent");
+//   private static final Key<Boolean> HAS_FOCUS = Key.create("Component.hasFocus");
+// 
+//   /**
+//    * A key for hiding a line under the window title bar on macOS
+//    * It works if and only if transparent title bars are enabled and IDE runs on JetBrains Runtime
+//    */
+//   @ApiStatus.Internal
+//   public static final String NO_BORDER_UNDER_WINDOW_TITLE_KEY = "";
+// 
+//   // cannot be static because logging maybe not configured yet
+//   private static @NotNull Logger getLogger() {
+//     return Logger.getInstance(UIUtil.class);
+//   }
+// 
+//   public static int getTransparentTitleBarHeight(JRootPane rootPane) {
+//     Object property = rootPane.getClientProperty("Window.transparentTitleBarHeight");
+//     if (property instanceof Integer) {
+//       return (int)property;
+//     }
+// 
+//     if ("small".equals(rootPane.getClientProperty("Window.style"))) {
+//       return JBUI.getInt("macOSWindow.Title.heightSmall", 19);
+//     }
+//     else {
+//       return JBUI.getInt("macOSWindow.Title.height", SystemInfo.isMacOSBigSur ? 29 : 23);
+//     }
+//   }
+// 
+//   // Here we setup dialog to be suggested in OwnerOptional as owner even if the dialog is not modal
+//   public static void markAsPossibleOwner(Dialog dialog) {
+//     ClientProperty.put(dialog, "PossibleOwner", Boolean.TRUE);
+//   }
+// 
+//   public static boolean isPossibleOwner(@NotNull Dialog dialog) {
+//     return ClientProperty.isTrue(dialog, "PossibleOwner");
+//   }
+// 
+//   public static int getMultiClickInterval() {
+//     Object property = Toolkit.getDefaultToolkit().getDesktopProperty("awt.multiClickInterval");
+//     if (property instanceof Integer) {
+//       return (Integer)property;
+//     }
+//     return 500;
+//   }
+// 
+//   private static final Supplier<Boolean> X_RENDER_ACTIVE = new SynchronizedClearableLazy<>(() -> {
+//     if (!StartupUiUtil.isXToolkit()) {
+//       return false;
+//     }
+// 
+//     try {
+//       Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass("sun.awt.X11GraphicsEnvironment");
+//       Method method = clazz.getMethod("isXRenderAvailable");
+//       return (Boolean)method.invoke(null);
+//     }
+//     catch (Throwable e) {
+//       return false;
+//     }
+//   });
+// 
+//   private static final String[] STANDARD_FONT_SIZES =
+//     {"8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"};
+// 
+//   public static void applyStyle(@NotNull ComponentStyle componentStyle, @NotNull Component comp) {
+//     if (!(comp instanceof JComponent c)) {
+//       return;
+//     }
+// 
+//     if (isUnderAquaBasedLookAndFeel()) {
+//       c.putClientProperty("JComponent.sizeVariant", Strings.toLowerCase(componentStyle.name()));
+//     }
+//     FontSize fontSize;
+//     if (componentStyle == ComponentStyle.MINI) {
+//       fontSize = FontSize.MINI;
+//     }
+//     else if (componentStyle == ComponentStyle.SMALL) {
+//       fontSize = FontSize.SMALL;
+//     }
+//     else {
+//       fontSize = FontSize.NORMAL;
+//     }
+//     c.setFont(getFont(fontSize, c.getFont()));
+//     Container p = c.getParent();
+//     if (p != null) {
+//       SwingUtilities.updateComponentTreeUI(p);
+//     }
+//   }
+// 
+//   public static @Nullable Cursor cursorIfNotDefault(@Nullable Cursor cursorToSet) {
+//     return cursorToSet != null && cursorToSet.getType() != Cursor.DEFAULT_CURSOR ? cursorToSet : null;
+//   }
+// 
+//   public static @NotNull RGBImageFilter getGrayFilter() {
+//     return GrayFilter.namedFilter("grayFilter", new GrayFilter(33, -35, 100));
+//   }
+// 
+//   public static @NotNull RGBImageFilter getTextGrayFilter() {
+//     return GrayFilter.namedFilter("text.grayFilter", new GrayFilter(20, 0, 100));
+//   }
+// 
+//   public static @NotNull Couple<Color> getCellColors(@NotNull JTable table, boolean isSel, int row, int column) {
+//     return Couple.of(isSel ? table.getSelectionForeground() : table.getForeground(),
+//                      isSel ? table.getSelectionBackground() : table.getBackground());
+//   }
+// 
+//   public static void fixOSXEditorBackground(@NotNull JTable table) {
+//     if (!SystemInfoRt.isMac) {
+//       return;
+//     }
+// 
+//     if (table.isEditing()) {
+//       int column = table.getEditingColumn();
+//       int row = table.getEditingRow();
+//       Component renderer = column >= 0 && row >= 0 ? table.getCellRenderer(row, column)
+//         .getTableCellRendererComponent(table, table.getValueAt(row, column), true, table.hasFocus(), row, column) : null;
+//       Component component = table.getEditorComponent();
+//       if (component != null && renderer != null) {
+//         changeBackGround(component, renderer.getBackground());
+//       }
+//     }
+//   }
+// 
+//   public enum FontSize {NORMAL, SMALL, MINI}
+// 
+//   public enum ComponentStyle {LARGE, REGULAR, SMALL, MINI}
+// 
+//   public enum FontColor {NORMAL, BRIGHTER}
+// 
+//   public static final char MNEMONIC = BundleBase.MNEMONIC;
+//   public static final @NlsSafe String HTML_MIME = "text/html";
+//   public static final @NonNls String TABLE_FOCUS_CELL_BACKGROUND_PROPERTY = "Table.focusCellBackground";
+//   public static final @NonNls String CENTER_TOOLTIP_DEFAULT = "ToCenterTooltip";
+//   public static final @NonNls String CENTER_TOOLTIP_STRICT = "ToCenterTooltip.default";
+// 
+//   public static final @NonNls String ENABLE_IME_FORWARDING_IN_POPUP = "EnableIMEForwardingInPopup";
+// 
+//   private static final Pattern CLOSE_TAG_PATTERN = Pattern.compile("<\\s*([^<>/ ]+)([^<>]*)/\\s*>", Pattern.CASE_INSENSITIVE);
+// 
+//   public static final Key<Integer> KEEP_BORDER_SIDES = Key.create("keepBorderSides");
+// 
+//   /**
+//    * Alt+click does copy text from tooltip or balloon to clipboard.
+//    * We collect this text from components recursively and this generic approach might 'grab' unexpected text fragments.
+//    * To provide more accurate text scope you should mark dedicated component with putClientProperty(TEXT_COPY_ROOT, Boolean.TRUE)
+//    * Note, main(root) components of BalloonImpl and AbstractPopup are already marked with this key
+//    */
+//   public static final Key<Boolean> TEXT_COPY_ROOT = Key.create("TEXT_COPY_ROOT");
+// 
+//   private static final Color ACTIVE_HEADER_COLOR = JBColor.namedColor("HeaderColor.active", 0xa0bad5);
+//   private static final Color INACTIVE_HEADER_COLOR = JBColor.namedColor("HeaderColor.inactive", Gray._128);
+// 
+//   public static final Color CONTRAST_BORDER_COLOR = JBColor.namedColor("Borders.ContrastBorderColor", new JBColor(0xC9C9C9, 0x323232));
+// 
+//   public static final Color SIDE_PANEL_BACKGROUND = JBColor.namedColor("SidePanel.background", new JBColor(0xE6EBF0, 0x3E434C));
+// 
+//   public static final Color AQUA_SEPARATOR_BACKGROUND_COLOR = new JBColor(Gray._240, Gray.x51);
+//   public static final Color TRANSPARENT_COLOR = Gray.TRANSPARENT;
+// 
+//   public static final int DEFAULT_HGAP = 10;
+//   public static final int DEFAULT_VGAP = 4;
+//   public static final int LARGE_VGAP = 12;
+// 
+//   private static final int REGULAR_PANEL_TOP_BOTTOM_INSET = 8;
+//   private static final int REGULAR_PANEL_LEFT_RIGHT_INSET = 12;
+// 
+//   public static final Insets PANEL_REGULAR_INSETS = getRegularPanelInsets();
+// 
+//   public static final Insets PANEL_SMALL_INSETS = JBInsets.create(5, 8);
+// 
+//   private static final @NonNls String ROOT_PANE = "JRootPane.future";
+// 
+//   private static final Ref<Boolean> ourRetina = Ref.create(SystemInfoRt.isMac ? null : false);
+// 
+//   private UIUtil() {
+//   }
+// 
+//   public static boolean isRetina(@NotNull Graphics2D graphics) {
+//     return SystemInfoRt.isMac ? DetectRetinaKit.isMacRetina(graphics) : isRetina();
+//   }
+// 
+//   public static boolean isRetina() {
+//     if (GraphicsEnvironment.isHeadless()) return false;
+// 
+//     //Temporary workaround for HiDPI on Windows/Linux
+//     if ("true".equalsIgnoreCase(System.getProperty("is.hidpi"))) {
+//       return true;
+//     }
+// 
+//     if (Registry.is("new.retina.detection", false)) {
+//       return DetectRetinaKit.isRetina();
+//     }
+//     else {
+//       synchronized (ourRetina) {
         if (ourRetina.isNull()) {
           ourRetina.set(false); // in case HiDPIScaledImage.drawIntoImage is not called for some reason
 

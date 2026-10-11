@@ -125,3 +125,5 @@ public final class MavenSettings implements SearchableConfigurable.Parent, Backe
     }
   }
 }
+
+// stand: uncommitted edit
