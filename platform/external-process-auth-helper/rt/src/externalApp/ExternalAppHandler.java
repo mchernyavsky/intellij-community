@@ -25,3 +25,5 @@ import org.jetbrains.annotations.NonNls;
 public interface ExternalAppHandler {
   @NonNls String HANDLER_ID_PARAMETER = "handlerId";
 }
+
+// stand: commit one touched this file

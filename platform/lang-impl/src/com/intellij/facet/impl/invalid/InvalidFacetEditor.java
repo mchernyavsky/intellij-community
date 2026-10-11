@@ -171,3 +171,5 @@ public final class InvalidFacetEditor extends FacetEditorTab {
     myInvalidFacetManager.setIgnored(myFacet, myIgnoreCheckBox.isSelected());
   }
 }
+
+// stand: commit one touched this file

@@ -46,3 +46,5 @@ public abstract class ActionOnFile implements MadTestingAction {
   }
     
 }
+
+// stand: commit one touched this file
