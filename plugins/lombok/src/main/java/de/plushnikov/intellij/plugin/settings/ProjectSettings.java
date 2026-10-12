@@ -21,3 +21,5 @@ public final class ProjectSettings {
     PropertiesComponent.getInstance(project).setValue(propertyName, String.valueOf(value), "");
   }
 }
+
+// stand: uncommitted edit

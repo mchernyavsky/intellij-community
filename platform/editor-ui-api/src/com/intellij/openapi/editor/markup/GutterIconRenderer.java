@@ -211,3 +211,5 @@ public abstract class GutterIconRenderer implements GutterMark, PossiblyDumbAwar
   @Override
   public abstract int hashCode();
 }
+
+// stand: uncommitted edit

@@ -29,3 +29,5 @@ public final class GroovyGenerateAccessorProvider implements NotNullFunction<Psi
     return result;
   }
 }
+
+// stand: uncommitted edit

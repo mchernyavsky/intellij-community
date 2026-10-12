@@ -162,3 +162,5 @@ public class LatestExistentSearcher {
     return SvnUtil.getHeadRevision(myVcs, myRepositoryUrl).getNumber();
   }
 }
+
+// stand: uncommitted edit

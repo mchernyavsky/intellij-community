@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # IntelliJ IDEA Community Edition (stand side B)
+=======
+# IntelliJ IDEA Community Edition (stand side A)
+>>>>>>> stand/conflict
 
 # IntelliJ Open Source Repository
 

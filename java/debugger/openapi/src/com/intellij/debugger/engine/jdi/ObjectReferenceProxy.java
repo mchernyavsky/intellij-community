@@ -17,3 +17,5 @@ package com.intellij.debugger.engine.jdi;
 
 public interface ObjectReferenceProxy {
 }
+
+// stand: uncommitted edit

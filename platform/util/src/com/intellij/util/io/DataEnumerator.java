@@ -15,3 +15,5 @@ public interface DataEnumerator<Data> {
   @Nullable
   Data valueOf(int idx) throws IOException;
 }
+
+// stand: uncommitted edit
