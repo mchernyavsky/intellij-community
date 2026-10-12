@@ -197,327 +197,327 @@ import com.intellij.util.DocumentUtil;
 import com.intellij.util.IJSwingUtilities;
 import com.intellij.util.MathUtil;
 import com.intellij.util.ObjectUtils;
-import com.intellij.util.Processor;
-import com.intellij.util.SingleEdtTaskScheduler;
-import com.intellij.util.SlowOperations;
-import com.intellij.util.SmartList;
-import com.intellij.util.concurrency.ThreadingAssertions;
-import com.intellij.util.concurrency.annotations.RequiresEdt;
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.ui.ButtonlessScrollBarUI;
-import com.intellij.util.ui.EdtInvocationManager;
-import com.intellij.util.ui.FocusUtil;
-import com.intellij.util.ui.GraphicsUtil;
-import com.intellij.util.ui.ImageUtil;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.JdkConstants;
-import com.intellij.util.ui.StartupUiUtil;
-import com.intellij.util.ui.TimerUtil;
-import com.intellij.util.ui.UIUtil;
-import com.intellij.util.ui.update.UiNotifyConnector;
-import kotlin.Unit;
-import kotlinx.coroutines.CoroutineScope;
-import org.intellij.lang.annotations.MagicConstant;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
-import org.jetbrains.annotations.VisibleForTesting;
-
-import javax.swing.BoundedRangeModel;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JViewport;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.TransferHandler;
-import javax.swing.border.Border;
-import javax.swing.plaf.ScrollBarUI;
-import javax.swing.plaf.ScrollPaneUI;
-import javax.swing.plaf.basic.BasicScrollBarUI;
-import java.awt.Adjustable;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.InputEvent;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.font.TextHitInfo;
-import java.awt.geom.Point2D;
-import java.awt.im.InputContext;
-import java.awt.im.InputMethodRequests;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.IOException;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
-import java.text.CharacterIterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TooManyListenersException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-
-public final class EditorImpl extends UserDataHolderBase implements EditorEx, HighlighterClient, Queryable, Dumpable {
-  public static final int TEXT_ALIGNMENT_LEFT = 0;
-  public static final int TEXT_ALIGNMENT_RIGHT = 1;
-
-  private static final Object CUSTOM_LAYER_MARKER = new Object();
-  static final float MIN_FONT_SIZE = 4;
-  private static final Logger LOG = Logger.getInstance(EditorImpl.class);
-  static final Logger EVENT_LOG = Logger.getInstance("editor.input.events");
-  // IJPL-52267 diagnostics: traces the full lifecycle of myLastMousePressedLocation (set on press,
-  // cleared on release, read by EditorComponentImpl.uiDataSnapshot for EDITOR_VIRTUAL_SPACE) so we can
-  // observe, from real usage, exactly when/how the field is left stale (e.g. a press whose release is
-  // never delivered to the editor). Off by default; enable #editor.mouse.pressed.location:trace.
-  static final Logger MOUSE_PRESS_LOG = Logger.getInstance("editor.mouse.pressed.location");
-  static final Object DND_COMMAND_GROUP = ObjectUtils.sentinel("DndCommand");
-  private static final Object MOUSE_DRAGGED_COMMAND_GROUP = ObjectUtils.sentinel("MouseDraggedGroup");
-  private static final Key<JComponent> PERMANENT_HEADER = Key.create("PERMANENT_HEADER");
-  static final Key<Boolean> CONTAINS_BIDI_TEXT = Key.create("contains.bidi.text");
-  public static final Key<Boolean> FORCED_SOFT_WRAPS = Key.create("forced.soft.wraps");
-  public static final Key<Boolean> SOFT_WRAPS_EXIST = Key.create("soft.wraps.exist");
-  @SuppressWarnings("WeakerAccess")
-  public static final Key<Boolean> DISABLE_CARET_POSITION_KEEPING = Key.create("editor.disable.caret.position.keeping");
-  public static final Key<Boolean> DISABLE_CARET_SHIFT_ON_WHITESPACE_INSERTION =
-    Key.create("editor.disable.caret.shift.on.whitespace.insertion");
-  public static final Key<Boolean> DISABLE_REMOVE_ON_DROP = Key.create("editor.disable.remove.on.drop");
-  private static final boolean HONOR_CAMEL_HUMPS_ON_TRIPLE_CLICK =
-    Boolean.parseBoolean(System.getProperty("idea.honor.camel.humps.on.triple.click"));
-  // A cache for CodeStyle.getSettings(myProject, myVirtualFile) and similar file-specific calls.
-  // Valid for this.myProject and this.myVirtualFile only.
-  // E.g., it is not a valid replacement for CodeStyle.getSettings(myProject).
-  @ApiStatus.Internal
-  public static final Key<CodeStyleSettings> CODE_STYLE_SETTINGS = Key.create("editor.code.style.settings");
-  private final @NotNull DocumentEx myDocument;
-  private final @Nullable DocumentEx myElfDocument;
-
-  private final JPanel myPanel;
-  private final @NotNull MyScrollPane myScrollPane;
-  private final @NotNull EditorComponentImpl myEditorComponent;
-  private final @NotNull EditorGutterComponentImpl myGutterComponent;
-  private final @Nullable StickyLinesManager myStickyLinesManager;
-  private final TraceableDisposable myTraceableDisposable = new TraceableDisposable(true);
-  private final FocusModeModel myFocusModeModel;
-  private volatile long myDisposalTimestampNanos;
-  private volatile long myLastTypedActionTimestamp = -1;
-  private String myLastTypedAction;
-  private LatencyListener myLatencyPublisher;
-
-  private static final Cursor EMPTY_CURSOR;
-  private final Map<Object, Cursor> myCustomCursors = new LinkedHashMap<>();
-  private Cursor myDefaultCursor;
-  boolean myCursorSetExternally;
-
-  private boolean myIsCurrentlyBuildingCache = false;
-  private final @Nullable EditorAnimationCache myContentAnimationCache;
-  private final @NotNull EditorCaretMutator caretMutator;
-
-  private static final Integer SCROLL_PANE_LAYER = 0;
-  private static final Integer STICKY_PANEL_LAYER = 200;
-  private static final Integer VERTICAL_SCROLLBAR_LAYER = 250;
-  private static final Integer FLOATING_TOOLBAR_LAYER = 300;
-  private static final Integer STATUS_COMPONENT_LAYER = 300;
-
-  static {
-    Cursor emptyCursor = null;
-    if (!GraphicsEnvironment.isHeadless()) {
-      try {
-        emptyCursor = Toolkit.getDefaultToolkit().createCustomCursor(ImageUtil.createImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-                                                                     new Point(),
-                                                                     "Empty cursor");
-      }
-      catch (Exception e) {
-        LOG.warn("Couldn't create an empty cursor", e);
-      }
-    }
-    EMPTY_CURSOR = emptyCursor;
-  }
-
-  private final CommandProcessor myCommandProcessor;
-  private final @NotNull MyScrollBar myVerticalScrollBar;
-
-  private final List<EditorMouseListener> myMouseListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-  private final @NotNull List<EditorMouseMotionListener> myMouseMotionListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-
-  private final ScrollingTimer myScrollingTimer = new ScrollingTimer();
-
-  private final @NotNull SettingsImpl mySettings;
-  private final @NotNull EditorState myState;
-
-  private boolean isReleased;
-
-  private boolean mySuppressPainting;
-  private boolean mySuppressDisposedPainting;
-
-  private @Nullable MouseEvent myMousePressedEvent;
-  private @Nullable MouseEvent myMouseMovedEvent;
-
-  private final MouseListener myMouseListener = new MyMouseAdapter();
-  private final MouseMotionListener myMouseMotionListener = new MyMouseMotionListener();
-
-  /**
-   * Holds information about area where mouse was pressed.
-   */
-  private @Nullable EditorMouseEventArea myMousePressArea;
-  private int mySavedSelectionStart = -1;
-  private int mySavedSelectionEnd = -1;
-
-  private final PropertyChangeSupport myPropertyChangeSupport = new PropertyChangeSupport(this);
-  private final EditorCopyPastProvider myEditable = new EditorCopyPastProvider(this);
-
-  private @NotNull EditorColorSchemeDelegate myScheme;
-  private final @NotNull SelectionModelImpl mySelectionModel;
-  private final @NotNull EditorMarkupModelImpl myMarkupModel;
-  private final @NotNull EditorFilteringMarkupModelEx myEditorFilteringMarkupModel;
-  private final @NotNull MarkupModelListener myMarkupModelListener;
-  private final @NotNull List<HighlighterListener> myHighlighterListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-
-  private final @NotNull FoldingModelImpl myFoldingModel;
-  private final @NotNull ScrollingModelImpl myScrollingModel;
-  private final @NotNull CaretModelImpl myCaretModel;
-  private final @NotNull CustomWrapModel myCustomWrapModel;
-  private final @NotNull SoftWrapModelImpl mySoftWrapModel;
-  private final @NotNull InlayModelImpl myInlayModel;
-
-  private @NotNull EditorScrollableIncrementProvider myScrollableIncrementProvider = EditorScrollableIncrementProvider.DEFAULT;
-
-  @MouseSelectionState
-  private int myMouseSelectionState;
-  private @Nullable FoldRegion myMouseSelectedRegion;
-  private PanelWithFloatingToolbar myLayeredPane;
-  private @Nullable EditorFloatingToolbar myEditorFloatingToolbar;
-
-  @MagicConstant(intValues = {MOUSE_SELECTION_STATE_NONE, MOUSE_SELECTION_STATE_LINE_SELECTED, MOUSE_SELECTION_STATE_WORD_SELECTED})
-  private @interface MouseSelectionState {
-  }
-
-  private static final int MOUSE_SELECTION_STATE_NONE = 0;
-  private static final int MOUSE_SELECTION_STATE_WORD_SELECTED = 1;
-  private static final int MOUSE_SELECTION_STATE_LINE_SELECTED = 2;
-
-  private volatile EditorHighlighter myHighlighter; // updated in EDT, but can be accessed from other threads (under read action)
-  private Disposable myHighlighterDisposable = Disposer.newDisposable();
-
-  private boolean myKeepSelectionOnMousePress;
-  private boolean myFocusKeepSelectionOnMousePress;
-
-  private boolean myUpdateCursor;
-  private final EditorScrollingPositionKeeper myScrollingPositionKeeper;
-  private boolean myRestoreScrollingPosition;
-  private int myRangeToRepaintStart;
-  private int myRangeToRepaintEnd;
-
-  private final @Nullable Project myProject;
-  private long myMouseSelectionChangeTimestamp;
-  private int mySavedCaretOffsetForDNDUndoHack;
-  private final List<FocusChangeListener> myFocusListeners = ContainerUtil.createLockFreeCopyOnWriteList();
-
-  private EditorInputMethodSupport myInputMethodSupport;
-  private final MouseDragSelectionEventHandler mouseDragHandler = new MouseDragSelectionEventHandler(e -> {
-    processMouseDragged(e);
-    return Unit.INSTANCE;
-  });
-  private VirtualFile myVirtualFile;
-  private @Nullable Dimension myPreferredSize;
-
-  private final SingleEdtTaskScheduler mouseSelectionStateAlarm = SingleEdtTaskScheduler.createSingleEdtTaskScheduler();
-  private Runnable mouseSelectionStateResetRunnable;
-  private final SingleEdtTaskScheduler errorStripeDelayedRepaintAlarm = SingleEdtTaskScheduler.createSingleEdtTaskScheduler();
-  // cached, because a burst of highlighter changes requests the repaint once per change
-  private final Runnable errorStripeDelayedRepaintTask = this::invokeDelayedErrorStripeRepaint;
-
-  private int myDragOnGutterSelectionStartLine = -1;
-  private RangeMarker myDraggedRange;
-  private boolean myMouseDragStarted;
-  private boolean myDragStarted;
-  private boolean myDragSelectionStarted;
-
-  private final @NotNull JPanel myHeaderPanel;
-
-  private @Nullable MouseEvent myInitialMouseEvent;
-  private boolean myIgnoreMouseEventsConsecutiveToInitial;
-
-  private EditorDropHandler myDropHandler;
-
-  private final HighlighterFilter myHighlightingFilter = new HighlighterFilter();
-
-  private final @NotNull IndentsModel myIndentsModel;
-
-  private int myStickySelectionStart;
-  private boolean myPurePaintingMode;
-
-  private final EditorSizeAdjustmentStrategy mySizeAdjustmentStrategy = new EditorSizeAdjustmentStrategy();
-  private final Disposable myDisposable = Disposer.newDisposable();
-  private final CoroutineScope myCoroutineScope;
-
-  private List<CaretState> myCaretStateBeforeLastPress;
-  LogicalPosition myLastMousePressedLocation;
-  // IJPL-52267 diagnostics: correlate every touch of myLastMousePressedLocation. Incremented on each
-  // press; the timestamp lets uiDataSnapshot report how long a (possibly stale) value has been retained.
-  int myMousePressSeq;
-  long myMousePressTimestampNanos;
-
-  private Point myLastMousePressedPoint;
-  private boolean myLastPressedOnGutter;
-  private boolean myLastPressedOnGutterIcon;
-  private VisualPosition myTargetMultiSelectionPosition;
-  private boolean myMultiSelectionInProgress;
-  private boolean myRectangularSelectionInProgress;
-  private boolean myLastPressCreatedCaret;
-  private boolean myLastPressWasAtBlockInlay;
-  // Set when the selection (normal or block one) initiated by mouse drag becomes noticeable (at least one character is selected).
-  // Reset on mouse press event.
-  private boolean myCurrentDragIsSubstantial;
+// import com.intellij.util.Processor;
+// import com.intellij.util.SingleEdtTaskScheduler;
+// import com.intellij.util.SlowOperations;
+// import com.intellij.util.SmartList;
+// import com.intellij.util.concurrency.ThreadingAssertions;
+// import com.intellij.util.concurrency.annotations.RequiresEdt;
+// import com.intellij.util.containers.ContainerUtil;
+// import com.intellij.util.ui.ButtonlessScrollBarUI;
+// import com.intellij.util.ui.EdtInvocationManager;
+// import com.intellij.util.ui.FocusUtil;
+// import com.intellij.util.ui.GraphicsUtil;
+// import com.intellij.util.ui.ImageUtil;
+// import com.intellij.util.ui.JBUI;
+// import com.intellij.util.ui.JdkConstants;
+// import com.intellij.util.ui.StartupUiUtil;
+// import com.intellij.util.ui.TimerUtil;
+// import com.intellij.util.ui.UIUtil;
+// import com.intellij.util.ui.update.UiNotifyConnector;
+// import kotlin.Unit;
+// import kotlinx.coroutines.CoroutineScope;
+// import org.intellij.lang.annotations.MagicConstant;
+// import org.jetbrains.annotations.ApiStatus;
+// import org.jetbrains.annotations.Contract;
+// import org.jetbrains.annotations.NonNls;
+// import org.jetbrains.annotations.NotNull;
+// import org.jetbrains.annotations.Nullable;
+// import org.jetbrains.annotations.TestOnly;
+// import org.jetbrains.annotations.VisibleForTesting;
+// 
+// import javax.swing.BoundedRangeModel;
+// import javax.swing.JButton;
+// import javax.swing.JComponent;
+// import javax.swing.JPanel;
+// import javax.swing.JScrollBar;
+// import javax.swing.JScrollPane;
+// import javax.swing.JViewport;
+// import javax.swing.ScrollPaneConstants;
+// import javax.swing.SwingConstants;
+// import javax.swing.SwingUtilities;
+// import javax.swing.Timer;
+// import javax.swing.TransferHandler;
+// import javax.swing.border.Border;
+// import javax.swing.plaf.ScrollBarUI;
+// import javax.swing.plaf.ScrollPaneUI;
+// import javax.swing.plaf.basic.BasicScrollBarUI;
+// import java.awt.Adjustable;
+// import java.awt.BorderLayout;
+// import java.awt.Color;
+// import java.awt.Component;
+// import java.awt.Cursor;
+// import java.awt.Dimension;
+// import java.awt.Font;
+// import java.awt.FontMetrics;
+// import java.awt.Graphics;
+// import java.awt.Graphics2D;
+// import java.awt.GraphicsEnvironment;
+// import java.awt.Insets;
+// import java.awt.KeyboardFocusManager;
+// import java.awt.MouseInfo;
+// import java.awt.Point;
+// import java.awt.Rectangle;
+// import java.awt.Toolkit;
+// import java.awt.Window;
+// import java.awt.datatransfer.Transferable;
+// import java.awt.datatransfer.UnsupportedFlavorException;
+// import java.awt.dnd.DropTarget;
+// import java.awt.dnd.DropTargetAdapter;
+// import java.awt.dnd.DropTargetDragEvent;
+// import java.awt.dnd.DropTargetDropEvent;
+// import java.awt.event.ComponentAdapter;
+// import java.awt.event.ComponentEvent;
+// import java.awt.event.FocusEvent;
+// import java.awt.event.FocusListener;
+// import java.awt.event.InputEvent;
+// import java.awt.event.InputMethodEvent;
+// import java.awt.event.InputMethodListener;
+// import java.awt.event.KeyEvent;
+// import java.awt.event.KeyListener;
+// import java.awt.event.MouseAdapter;
+// import java.awt.event.MouseEvent;
+// import java.awt.event.MouseListener;
+// import java.awt.event.MouseMotionListener;
+// import java.awt.event.MouseWheelEvent;
+// import java.awt.font.TextHitInfo;
+// import java.awt.geom.Point2D;
+// import java.awt.im.InputContext;
+// import java.awt.im.InputMethodRequests;
+// import java.awt.image.BufferedImage;
+// import java.beans.PropertyChangeEvent;
+// import java.beans.PropertyChangeListener;
+// import java.beans.PropertyChangeSupport;
+// import java.io.IOException;
+// import java.text.AttributedCharacterIterator;
+// import java.text.AttributedString;
+// import java.text.CharacterIterator;
+// import java.util.ArrayList;
+// import java.util.Collection;
+// import java.util.Collections;
+// import java.util.LinkedHashMap;
+// import java.util.List;
+// import java.util.Map;
+// import java.util.Objects;
+// import java.util.TooManyListenersException;
+// import java.util.concurrent.atomic.AtomicBoolean;
+// import java.util.concurrent.atomic.AtomicLong;
+// import java.util.concurrent.atomic.AtomicReference;
+// import java.util.function.Function;
+// import java.util.function.IntFunction;
+// import java.util.function.Predicate;
+// 
+// public final class EditorImpl extends UserDataHolderBase implements EditorEx, HighlighterClient, Queryable, Dumpable {
+//   public static final int TEXT_ALIGNMENT_LEFT = 0;
+//   public static final int TEXT_ALIGNMENT_RIGHT = 1;
+// 
+//   private static final Object CUSTOM_LAYER_MARKER = new Object();
+//   static final float MIN_FONT_SIZE = 4;
+//   private static final Logger LOG = Logger.getInstance(EditorImpl.class);
+//   static final Logger EVENT_LOG = Logger.getInstance("editor.input.events");
+//   // IJPL-52267 diagnostics: traces the full lifecycle of myLastMousePressedLocation (set on press,
+//   // cleared on release, read by EditorComponentImpl.uiDataSnapshot for EDITOR_VIRTUAL_SPACE) so we can
+//   // observe, from real usage, exactly when/how the field is left stale (e.g. a press whose release is
+//   // never delivered to the editor). Off by default; enable #editor.mouse.pressed.location:trace.
+//   static final Logger MOUSE_PRESS_LOG = Logger.getInstance("editor.mouse.pressed.location");
+//   static final Object DND_COMMAND_GROUP = ObjectUtils.sentinel("DndCommand");
+//   private static final Object MOUSE_DRAGGED_COMMAND_GROUP = ObjectUtils.sentinel("MouseDraggedGroup");
+//   private static final Key<JComponent> PERMANENT_HEADER = Key.create("PERMANENT_HEADER");
+//   static final Key<Boolean> CONTAINS_BIDI_TEXT = Key.create("contains.bidi.text");
+//   public static final Key<Boolean> FORCED_SOFT_WRAPS = Key.create("forced.soft.wraps");
+//   public static final Key<Boolean> SOFT_WRAPS_EXIST = Key.create("soft.wraps.exist");
+//   @SuppressWarnings("WeakerAccess")
+//   public static final Key<Boolean> DISABLE_CARET_POSITION_KEEPING = Key.create("editor.disable.caret.position.keeping");
+//   public static final Key<Boolean> DISABLE_CARET_SHIFT_ON_WHITESPACE_INSERTION =
+//     Key.create("editor.disable.caret.shift.on.whitespace.insertion");
+//   public static final Key<Boolean> DISABLE_REMOVE_ON_DROP = Key.create("editor.disable.remove.on.drop");
+//   private static final boolean HONOR_CAMEL_HUMPS_ON_TRIPLE_CLICK =
+//     Boolean.parseBoolean(System.getProperty("idea.honor.camel.humps.on.triple.click"));
+//   // A cache for CodeStyle.getSettings(myProject, myVirtualFile) and similar file-specific calls.
+//   // Valid for this.myProject and this.myVirtualFile only.
+//   // E.g., it is not a valid replacement for CodeStyle.getSettings(myProject).
+//   @ApiStatus.Internal
+//   public static final Key<CodeStyleSettings> CODE_STYLE_SETTINGS = Key.create("editor.code.style.settings");
+//   private final @NotNull DocumentEx myDocument;
+//   private final @Nullable DocumentEx myElfDocument;
+// 
+//   private final JPanel myPanel;
+//   private final @NotNull MyScrollPane myScrollPane;
+//   private final @NotNull EditorComponentImpl myEditorComponent;
+//   private final @NotNull EditorGutterComponentImpl myGutterComponent;
+//   private final @Nullable StickyLinesManager myStickyLinesManager;
+//   private final TraceableDisposable myTraceableDisposable = new TraceableDisposable(true);
+//   private final FocusModeModel myFocusModeModel;
+//   private volatile long myDisposalTimestampNanos;
+//   private volatile long myLastTypedActionTimestamp = -1;
+//   private String myLastTypedAction;
+//   private LatencyListener myLatencyPublisher;
+// 
+//   private static final Cursor EMPTY_CURSOR;
+//   private final Map<Object, Cursor> myCustomCursors = new LinkedHashMap<>();
+//   private Cursor myDefaultCursor;
+//   boolean myCursorSetExternally;
+// 
+//   private boolean myIsCurrentlyBuildingCache = false;
+//   private final @Nullable EditorAnimationCache myContentAnimationCache;
+//   private final @NotNull EditorCaretMutator caretMutator;
+// 
+//   private static final Integer SCROLL_PANE_LAYER = 0;
+//   private static final Integer STICKY_PANEL_LAYER = 200;
+//   private static final Integer VERTICAL_SCROLLBAR_LAYER = 250;
+//   private static final Integer FLOATING_TOOLBAR_LAYER = 300;
+//   private static final Integer STATUS_COMPONENT_LAYER = 300;
+// 
+//   static {
+//     Cursor emptyCursor = null;
+//     if (!GraphicsEnvironment.isHeadless()) {
+//       try {
+//         emptyCursor = Toolkit.getDefaultToolkit().createCustomCursor(ImageUtil.createImage(1, 1, BufferedImage.TYPE_INT_ARGB),
+//                                                                      new Point(),
+//                                                                      "Empty cursor");
+//       }
+//       catch (Exception e) {
+//         LOG.warn("Couldn't create an empty cursor", e);
+//       }
+//     }
+//     EMPTY_CURSOR = emptyCursor;
+//   }
+// 
+//   private final CommandProcessor myCommandProcessor;
+//   private final @NotNull MyScrollBar myVerticalScrollBar;
+// 
+//   private final List<EditorMouseListener> myMouseListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+//   private final @NotNull List<EditorMouseMotionListener> myMouseMotionListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+// 
+//   private final ScrollingTimer myScrollingTimer = new ScrollingTimer();
+// 
+//   private final @NotNull SettingsImpl mySettings;
+//   private final @NotNull EditorState myState;
+// 
+//   private boolean isReleased;
+// 
+//   private boolean mySuppressPainting;
+//   private boolean mySuppressDisposedPainting;
+// 
+//   private @Nullable MouseEvent myMousePressedEvent;
+//   private @Nullable MouseEvent myMouseMovedEvent;
+// 
+//   private final MouseListener myMouseListener = new MyMouseAdapter();
+//   private final MouseMotionListener myMouseMotionListener = new MyMouseMotionListener();
+// 
+//   /**
+//    * Holds information about area where mouse was pressed.
+//    */
+//   private @Nullable EditorMouseEventArea myMousePressArea;
+//   private int mySavedSelectionStart = -1;
+//   private int mySavedSelectionEnd = -1;
+// 
+//   private final PropertyChangeSupport myPropertyChangeSupport = new PropertyChangeSupport(this);
+//   private final EditorCopyPastProvider myEditable = new EditorCopyPastProvider(this);
+// 
+//   private @NotNull EditorColorSchemeDelegate myScheme;
+//   private final @NotNull SelectionModelImpl mySelectionModel;
+//   private final @NotNull EditorMarkupModelImpl myMarkupModel;
+//   private final @NotNull EditorFilteringMarkupModelEx myEditorFilteringMarkupModel;
+//   private final @NotNull MarkupModelListener myMarkupModelListener;
+//   private final @NotNull List<HighlighterListener> myHighlighterListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+// 
+//   private final @NotNull FoldingModelImpl myFoldingModel;
+//   private final @NotNull ScrollingModelImpl myScrollingModel;
+//   private final @NotNull CaretModelImpl myCaretModel;
+//   private final @NotNull CustomWrapModel myCustomWrapModel;
+//   private final @NotNull SoftWrapModelImpl mySoftWrapModel;
+//   private final @NotNull InlayModelImpl myInlayModel;
+// 
+//   private @NotNull EditorScrollableIncrementProvider myScrollableIncrementProvider = EditorScrollableIncrementProvider.DEFAULT;
+// 
+//   @MouseSelectionState
+//   private int myMouseSelectionState;
+//   private @Nullable FoldRegion myMouseSelectedRegion;
+//   private PanelWithFloatingToolbar myLayeredPane;
+//   private @Nullable EditorFloatingToolbar myEditorFloatingToolbar;
+// 
+//   @MagicConstant(intValues = {MOUSE_SELECTION_STATE_NONE, MOUSE_SELECTION_STATE_LINE_SELECTED, MOUSE_SELECTION_STATE_WORD_SELECTED})
+//   private @interface MouseSelectionState {
+//   }
+// 
+//   private static final int MOUSE_SELECTION_STATE_NONE = 0;
+//   private static final int MOUSE_SELECTION_STATE_WORD_SELECTED = 1;
+//   private static final int MOUSE_SELECTION_STATE_LINE_SELECTED = 2;
+// 
+//   private volatile EditorHighlighter myHighlighter; // updated in EDT, but can be accessed from other threads (under read action)
+//   private Disposable myHighlighterDisposable = Disposer.newDisposable();
+// 
+//   private boolean myKeepSelectionOnMousePress;
+//   private boolean myFocusKeepSelectionOnMousePress;
+// 
+//   private boolean myUpdateCursor;
+//   private final EditorScrollingPositionKeeper myScrollingPositionKeeper;
+//   private boolean myRestoreScrollingPosition;
+//   private int myRangeToRepaintStart;
+//   private int myRangeToRepaintEnd;
+// 
+//   private final @Nullable Project myProject;
+//   private long myMouseSelectionChangeTimestamp;
+//   private int mySavedCaretOffsetForDNDUndoHack;
+//   private final List<FocusChangeListener> myFocusListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+// 
+//   private EditorInputMethodSupport myInputMethodSupport;
+//   private final MouseDragSelectionEventHandler mouseDragHandler = new MouseDragSelectionEventHandler(e -> {
+//     processMouseDragged(e);
+//     return Unit.INSTANCE;
+//   });
+//   private VirtualFile myVirtualFile;
+//   private @Nullable Dimension myPreferredSize;
+// 
+//   private final SingleEdtTaskScheduler mouseSelectionStateAlarm = SingleEdtTaskScheduler.createSingleEdtTaskScheduler();
+//   private Runnable mouseSelectionStateResetRunnable;
+//   private final SingleEdtTaskScheduler errorStripeDelayedRepaintAlarm = SingleEdtTaskScheduler.createSingleEdtTaskScheduler();
+//   // cached, because a burst of highlighter changes requests the repaint once per change
+//   private final Runnable errorStripeDelayedRepaintTask = this::invokeDelayedErrorStripeRepaint;
+// 
+//   private int myDragOnGutterSelectionStartLine = -1;
+//   private RangeMarker myDraggedRange;
+//   private boolean myMouseDragStarted;
+//   private boolean myDragStarted;
+//   private boolean myDragSelectionStarted;
+// 
+//   private final @NotNull JPanel myHeaderPanel;
+// 
+//   private @Nullable MouseEvent myInitialMouseEvent;
+//   private boolean myIgnoreMouseEventsConsecutiveToInitial;
+// 
+//   private EditorDropHandler myDropHandler;
+// 
+//   private final HighlighterFilter myHighlightingFilter = new HighlighterFilter();
+// 
+//   private final @NotNull IndentsModel myIndentsModel;
+// 
+//   private int myStickySelectionStart;
+//   private boolean myPurePaintingMode;
+// 
+//   private final EditorSizeAdjustmentStrategy mySizeAdjustmentStrategy = new EditorSizeAdjustmentStrategy();
+//   private final Disposable myDisposable = Disposer.newDisposable();
+//   private final CoroutineScope myCoroutineScope;
+// 
+//   private List<CaretState> myCaretStateBeforeLastPress;
+//   LogicalPosition myLastMousePressedLocation;
+//   // IJPL-52267 diagnostics: correlate every touch of myLastMousePressedLocation. Incremented on each
+//   // press; the timestamp lets uiDataSnapshot report how long a (possibly stale) value has been retained.
+//   int myMousePressSeq;
+//   long myMousePressTimestampNanos;
+// 
+//   private Point myLastMousePressedPoint;
+//   private boolean myLastPressedOnGutter;
+//   private boolean myLastPressedOnGutterIcon;
+//   private VisualPosition myTargetMultiSelectionPosition;
+//   private boolean myMultiSelectionInProgress;
+//   private boolean myRectangularSelectionInProgress;
+//   private boolean myLastPressCreatedCaret;
+//   private boolean myLastPressWasAtBlockInlay;
+//   // Set when the selection (normal or block one) initiated by mouse drag becomes noticeable (at least one character is selected).
+//   // Reset on mouse press event.
+//   private boolean myCurrentDragIsSubstantial;
   private boolean myForcePushHappened;
   private boolean myMouseIsInDrag;
   private boolean myIsCurrentlyInFocus = true;
