@@ -37,3 +37,5 @@ public final class SingleCharSequence implements CharSequence {
     return String.valueOf(myCh);
   }
 }
+
+// stand: commit one touched this file
